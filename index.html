@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#233865">
+<title>Saltos multiplicadores</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef5ff;color:#233865;font-family:system-ui,sans-serif}button{font:inherit;cursor:pointer;touch-action:manipulation}button:focus-visible{outline:4px solid #f28b24;outline-offset:4px}button:disabled{cursor:default}.app{max-width:650px;margin:auto;padding:20px 16px 32px}header{display:flex;align-items:center;gap:12px}h1{font-size:clamp(24px,6vw,34px);margin:0}.badge{font-size:35px}header p{margin:4px 0;color:#536784}.tables{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:22px 0 16px}.table{min-height:48px;border:2px solid #c7d8ef;border-radius:14px;background:white;font-weight:800;color:#233865}.table.active{background:#233865;color:white;border-color:#233865}.table.done{border-color:#209b78}.table.done:after{content:' ✓';font-size:12px;color:#209b78}.table.active.done:after{color:#9cf5d2}.progress-label{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:8px}progress{width:100%;height:12px;accent-color:#209b78}.scene{position:relative;height:390px;margin-top:18px;border-radius:28px;overflow:hidden;background:linear-gradient(#ace5ff 0%,#d9f8ff 64%,#5068ac 64%,#263759 100%);isolation:isolate}.scene:before{content:'☁';position:absolute;color:#fff9;font-size:100px;top:4px;left:15px}.scene:after{content:'☁';position:absolute;color:#fff9;font-size:80px;top:30px;right:15px;z-index:-1}.instruction{position:absolute;top:22px;left:0;right:0;text-align:center;font-weight:750;font-size:16px}.current{position:absolute;left:24%;right:24%;bottom:38px;background:#fff1b0;border-bottom:12px solid #d49540;border-radius:15px;text-align:center;padding:14px 0;font-weight:900;font-size:36px;box-shadow:0 7px 0 #0002}.answers{position:absolute;top:148px;left:12px;right:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.answer{position:relative;border:0;border-bottom:12px solid #388666;border-radius:15px;background:#b7f0b3;color:#193f37;min-height:80px;font-size:clamp(30px,9vw,42px);font-weight:900;box-shadow:0 7px 0 #0002}.answer:nth-child(2){background:#ffe4a1;border-color:#d49540}.answer:nth-child(3){background:#e0c3ff;border-color:#9271c4}.answer:disabled{opacity:1;color:#193f37}.answer.correct{outline:5px solid #188861}.answer.broken{animation:break .65s forwards}.hero{position:absolute;width:52px;height:56px;left:calc(50% - 26px);top:230px;z-index:4;pointer-events:none;filter:drop-shadow(0 4px 2px #0002)}.hero-body{position:absolute;inset:9px 5px 0;background:#ff776d;border:3px solid #ba4e53;border-radius:20px 20px 14px 14px;transform:rotate(-4deg)}.hero-body:before{content:'••';position:absolute;top:2px;left:9px;letter-spacing:8px;font-size:21px;color:#233865}.hero-body:after{content:'⌣';position:absolute;top:15px;left:13px;font-size:24px;color:#233865}.hero-hat{position:absolute;top:0;left:6px;font-size:23px;transform:rotate(-15deg)}.message{margin:18px 0 0;background:white;border-radius:20px;padding:18px;text-align:center;min-height:114px;box-shadow:0 4px 20px #23386508}.message h2{margin:0 0 8px;font-size:23px}.message p{margin:0;line-height:1.5;color:#536784}.primary{border:0;border-radius:14px;background:#233865;color:white;font-weight:750;padding:14px 20px;min-height:50px;margin-top:14px;width:100%}.footer{text-align:center;font-size:13px;color:#536784;margin-top:18px}.save-warning{color:#a04416;font-size:14px;margin-top:10px}.hidden{display:none}@keyframes break{30%{transform:rotate(-9deg)}100%{transform:translateY(170px) rotate(25deg);opacity:0}}@media(max-width:360px){.app{padding:16px 10px}.tables{gap:3px}.table{border-radius:10px}.answers{gap:8px}.scene{height:370px}.hero{top:210px}}@media(prefers-reduced-motion:reduce){.answer.broken{animation-duration:.01s}}
+</style>
+</head>
+<body>
+<main class="app">
+<header><span class="badge" aria-hidden="true">🌟</span><div><h1>Saltos multiplicadores</h1><p>¡Un salto, una nueva aventura!</p></div></header>
+<nav class="tables" aria-label="Elegir tabla de multiplicar"></nav>
+<div class="progress-label"><span id="table-label"></span><span id="step-label"></span></div>
+<progress id="progress" max="10" value="0" aria-label="Progreso de la tabla"></progress>
+<section class="scene" aria-label="Juego de plataformas">
+<div class="instruction" id="instruction">Toca la respuesta para saltar</div>
+<div class="answers" id="answers"></div>
+<div class="hero" id="hero" aria-hidden="true"><div class="hero-body"></div><span class="hero-hat">⭐</span></div>
+<div class="current" id="question"></div>
+</section>
+<section class="message" aria-live="polite" aria-atomic="true"><h2 id="message-title"></h2><p id="message-text"></p><button class="primary hidden" id="action"></button></section>
+<p id="save-warning" class="save-warning hidden">El navegador no permite guardar el progreso. Puedes jugar, pero se perderá al cerrar.</p>
+<p class="footer" id="summary"></p>
+<button class="primary hidden" id="install">Instalar juego</button>
+<p class="footer" id="offline-status" role="status"></p>
+</main>
+<script>
+'use strict';
+const KEY='saltos-multiplicadores-v1';
+const $=id=>document.getElementById(id);
+let state={table:2,step:1,completed:[]},busy=false,failed=false,finished=false;
+try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved&&Number.isInteger(saved.table)&&saved.table>=2&&saved.table<=9&&Number.isInteger(saved.step)&&saved.step>=1&&saved.step<=10&&Array.isArray(saved.completed)){state={table:saved.table,step:saved.step,completed:[...new Set(saved.completed.filter(n=>Number.isInteger(n)&&n>=2&&n<=9))]}}}catch{ $('save-warning').classList.remove('hidden'); }
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{$('save-warning').classList.remove('hidden')}}
+function choices(correct){const values=new Set([correct]);while(values.size<3){const offset=1+Math.floor(Math.random()*Math.max(5,state.table*2));const candidate=correct+(Math.random()<.5?-offset:offset);if(candidate>0)values.add(candidate)}const result=[...values];for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]]}return result}
+function message(title,text,button,callback){$('message-title').textContent=title;$('message-text').textContent=text;$('action').classList.toggle('hidden',!button);$('action').textContent=button||'';$('action').onclick=callback||null}
+function render(){
+ busy=false;failed=false;finished=false;$('hero').style.transform='';$('hero').style.opacity='1';
+ document.querySelector('.tables').replaceChildren();for(let n=2;n<=9;n++){const b=document.createElement('button');b.className='table'+(n===state.table?' active':'')+(state.completed.includes(n)?' done':'');b.textContent=n;b.setAttribute('aria-label',`Tabla del ${n}${state.completed.includes(n)?', completada':''}`);b.setAttribute('aria-pressed',n===state.table);b.onclick=()=>{if(busy)return;state.table=n;state.step=1;save();render()};document.querySelector('.tables').append(b)}
+ $('table-label').textContent=`Tabla del ${state.table}`;$('step-label').textContent=`${state.step} de 10`;$('progress').value=state.step-1;$('summary').textContent=`${state.completed.length} de 8 tablas completadas · Progreso guardado en este navegador`;
+ $('question').textContent=`${state.table} × ${state.step}`;$('instruction').textContent='Toca la respuesta para saltar';$('answers').replaceChildren();for(const value of choices(state.table*state.step)){const b=document.createElement('button');b.className='answer';b.textContent=value;b.setAttribute('aria-label',`Saltar a ${value}`);b.onclick=()=>jump(b,value);$('answers').append(b)}message('¡Elige tu próximo salto!','Resuelve la multiplicación y toca la plataforma correcta.');
+}
+async function jump(button,value){
+ if(busy||failed||finished)return;busy=true;document.querySelectorAll('.answer,.table').forEach(b=>b.disabled=true);
+ const hero=$('hero'),a=hero.getBoundingClientRect(),b=button.getBoundingClientRect(),dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top-a.bottom;
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const flight=hero.animate([{transform:'translate(0,0)'},{transform:`translate(${dx*.5}px,${Math.min(dy-65,-100)}px)`,offset:.5},{transform:`translate(${dx}px,${dy}px)`}],{duration:reduce?1:600,easing:'ease-in-out',fill:'forwards'});await flight.finished;hero.style.transform=`translate(${dx}px,${dy}px)`;flight.cancel();
+ const correct=state.table*state.step;
+ if(value===correct){button.classList.add('correct');message('¡Buen salto! ✨',`${state.table} × ${state.step} = ${correct}`);await new Promise(r=>setTimeout(r,reduce?50:650));
+ if(state.step<10){state.step++;save();render()}else{if(!state.completed.includes(state.table))state.completed.push(state.table);save();finished=true;busy=false;$('progress').value=10;$('instruction').textContent='¡Tabla completada!';document.querySelectorAll('.table').forEach(b=>b.disabled=false);document.querySelector('.table.active').classList.add('done');$('summary').textContent=`${state.completed.length} de 8 tablas completadas · Progreso guardado en este navegador`;const next=state.table<9?state.table+1:null;message(state.completed.length===8?'¡Completaste todas las tablas! 🏆':'¡Tabla completada! 🎉','Tus tablas completadas quedan guardadas. Puedes seguir jugando cuando quieras.',next?`Continuar con la tabla del ${next}`:'Volver a jugar la tabla del 9',()=>{state.table=next||9;state.step=1;save();render()})}
+ }else{button.classList.add('broken');const fall=hero.animate([{transform:`translate(${dx}px,${dy}px)`,opacity:1},{transform:`translate(${dx}px,230px) rotate(35deg)`,opacity:0}],{duration:reduce?1:800,easing:'ease-in',fill:'forwards'});await fall.finished;hero.style.opacity='0';fall.cancel();failed=true;busy=false;state.step=1;save();document.querySelectorAll('.table').forEach(b=>b.disabled=false);$('instruction').textContent='¡Ups! La plataforma se rompió';message('¡No pasa nada! ☁️',`La respuesta correcta es ${correct}. ¡${$('question').textContent} = ${correct}! Vamos a intentarlo de nuevo.`,`Reiniciar tabla del ${state.table}`,render)}
+}
+render();
+let installPrompt;
+window.addEventListener('beforeinstallprompt', event => {
+ event.preventDefault(); installPrompt=event; $('install').classList.remove('hidden');
+});
+$('install').onclick=async()=>{if(!installPrompt)return;await installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$('install').classList.add('hidden')};
+window.addEventListener('appinstalled',()=>{$('install').classList.add('hidden');installPrompt=null});
+if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
+ $('offline-status').textContent='Preparando el juego para jugar sin conexión…';
+ navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{
+ $('offline-status').textContent='Listo para jugar sin internet. En Chrome: menú ⋮ → Instalar aplicación o Añadir a pantalla de inicio.';
+ }).catch(()=>{$('offline-status').textContent='No se pudo preparar el modo sin conexión. Recarga con internet para intentarlo de nuevo.'});
+}else{
+ $('offline-status').textContent='Para instalar el juego y habilitar el modo sin conexión, ábrelo desde su dirección HTTPS.';
+}
+</script>
+</body>
+</html>
